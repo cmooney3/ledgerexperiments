@@ -5,8 +5,9 @@ Block::Block(int64_t type) {
 }
 
 int64_t Block::Serialize(uint8_t *buf, uint64_t max_size) const {
-  uint64_t bytes_written = 0;
+  int64_t bytes_written = 0;
 
+  // First copy over the block type number
   if (max_size >= sizeof(type_)) {
     memcpy(buf, &type_, sizeof(type_));
     bytes_written += sizeof(type_);
@@ -14,6 +15,13 @@ int64_t Block::Serialize(uint8_t *buf, uint64_t max_size) const {
     return -1;
   }
 
+  // Note the location of the length value (second field) for now, and
+  // and then fill it in later after running the Aux function and before
+  // computing the hash.
+  int64_t length_position = bytes_written;
+  bytes_written += sizeof(bytes_written);  // effectively skipping this field
+
+  // Now call the helper function to serialize the payload
   int64_t payload_size = SerializeAux(buf + bytes_written,
                                       max_size - bytes_written);
   if (payload_size < 0) {
@@ -22,6 +30,12 @@ int64_t Block::Serialize(uint8_t *buf, uint64_t max_size) const {
     bytes_written += payload_size;
   }
 
+  // Storing the actual length in field 2 now that we've run the Aux function
+  // and know how long the block is now.
+  memcpy(buf + length_position, &bytes_written, sizeof(bytes_written));
+
+  // Finally compute a sha256 hash of all the preceding data and
+  // append it onto the end.
   uint8_t hash[SHA256_DIGEST_LENGTH];
 	ComputeHash(buf, bytes_written, hash);
   if (max_size - bytes_written < sizeof(hash)) {
