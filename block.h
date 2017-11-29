@@ -9,6 +9,7 @@
 
 using std::cerr;
 using std::endl;
+using std::memcmp;
 using std::memcpy;
 
 #define MAX_BLOCK_SIZE 128

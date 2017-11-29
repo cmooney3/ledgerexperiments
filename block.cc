@@ -35,15 +35,27 @@ int64_t Block::Serialize(uint8_t *buf, uint64_t max_size) const {
 }
 
 bool Block::Validate() const {
+  // First have the contents validate themselves
+  if (!ValidateAux()) {
+    return false;
+  }
+
+  // Next serialize the contents and confirm the sha256 hash
   uint8_t validation_buffer[MAX_BLOCK_SIZE];
   int64_t len = Serialize(validation_buffer, sizeof(validation_buffer));
   if (len < 0) {
     cerr << RED << "Not enought room to serialize/validate a block.  "
          << "Increase MAX_BLOCK_SIZE to make more room." << RESET << endl;
-    return 0;
+    return false;
   }
-
-  return ValidateAux();
+  uint8_t hash[SHA256_DIGEST_LENGTH];
+  ComputeHash(validation_buffer, len - SHA256_DIGEST_LENGTH, hash);
+  if (memcmp(hash, validation_buffer + len - SHA256_DIGEST_LENGTH,
+             SHA256_DIGEST_LENGTH) != 0) {
+    return false;
+  }
+  
+  return true;
 }
 
 void Block::ComputeHash(uint8_t* buf, uint64_t len, uint8_t* hash) const {
