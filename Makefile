@@ -1,8 +1,8 @@
 CC=g++
-EXENAME=ledger
+EXENAME=experiment
 TESTEXENAME=unittests
 LIBS=-lcrypto
-COPTS=-std=c++11
+COPTS=-std=c++11 -I.
 
 all: ${EXENAME} test
 
@@ -12,11 +12,11 @@ ${EXENAME}: main.cc block.o genesisBlock.o
 test: ./tests/*.cc block.o genesisBlock.o
 	${CC} ${COPTS} -o ${TESTEXENAME} ./tests/tests.cc *.o ${LIBS}
 
-genesisBlock.o: genesisBlock.h genesisBlock.cc block.o
-	${CC} ${COPTS} -c genesisBlock.cc
+genesisBlock.o: blocks/genesisBlock.h blocks/genesisBlock.cc block.o
+	${CC} ${COPTS} -c blocks/genesisBlock.cc
 
-block.o: block.h block.cc
-	${CC} ${COPTS} -c block.cc
+block.o: blocks/block.h blocks/block.cc
+	${CC} ${COPTS} -c blocks/block.cc
 
 tester.o: tests/tester.h tests/tester.cc block.o genesisBlock.o
 	${CC} ${COPTS} -c tests/tester.cc

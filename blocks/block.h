@@ -5,7 +5,7 @@
 #include <cstring>
 #include <stdint.h>
 #include "openssl/sha.h"
-#include "colors.h"
+#include "util/colors.h"
 
 using std::cerr;
 using std::endl;

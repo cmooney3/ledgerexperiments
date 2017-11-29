@@ -2,7 +2,7 @@
 // https://github.com/mity/acutest.git
 #include "acutest/include/acutest.h"
 
-#include "../genesisBlock.h"
+#include "blocks/genesisBlock.h"
 
 constexpr unsigned int kBigEnoughBufferSize = 1024;
 constexpr unsigned int kTooSmallBufferSize = 2;
